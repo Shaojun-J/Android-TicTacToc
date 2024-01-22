@@ -9,4 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lavender">#8692f7</color>
 
+    <color name="colorPrimary">#212021</color>
+    <color name="colorPrimaryDark">#1976d2</color>
+    <color name="colorAccent">#00b0ff</color>
+    <color name="colorGrey">#d6d7d6</color>
 </resources>

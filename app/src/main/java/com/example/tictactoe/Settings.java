@@ -3,11 +3,11 @@ package com.example.tictactoe;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class AddPlayers extends AppCompatActivity {
+public class Settings extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addplayers);
+        setContentView(R.layout.activity_settings);
     }
 }

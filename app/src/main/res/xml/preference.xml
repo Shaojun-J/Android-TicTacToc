@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+
+>
+
+    <EditTextPreference
+        android:key="player_one"
+        android:dialogTitle="Please enter Player one's name"
+        android:title="Player One's Name"
+        android:persistent="true"
+    />
+
+    <EditTextPreference
+            android:key="player_two"
+            android:title="Player Two's name"
+            android:dialogTitle="Please enter Player two's name"
+            android:summary="Player Two's name"
+            android:persistent="true"
+    />
+</PreferenceScreen>

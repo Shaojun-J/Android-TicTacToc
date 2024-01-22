@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        android:orientation="vertical"
         tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -18,19 +17,16 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             tools:ignore="MissingConstraints"/>
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-    />
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/container"
             android:layout_below="@+id/toolbar"
+
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
+
             android:orientation="vertical">
 
         <LinearLayout
@@ -190,8 +186,6 @@
 
     </LinearLayout>
 
-
-
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -202,6 +196,7 @@
 
         <TextView
                 android:id="@+id/showArea"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Player X's turn"
@@ -218,13 +213,9 @@
                 android:text="New Game"
                 android:textColor="@color/black"
                 android:padding="15dp"
-                android:layout_margin="15dp"
-
+                android:layout_marginRight="15dp"
+                android:layout_marginLeft="15dp"
         />
     </LinearLayout>
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-    />
-</androidx.appcompat.widget.LinearLayoutCompat>
+    
+</RelativeLayout>
