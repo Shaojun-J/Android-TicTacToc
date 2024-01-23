@@ -3,6 +3,7 @@ package com.example.tictactoe;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,6 +53,37 @@ public class MainActivity extends AppCompatActivity {
         combinationList.add(new int[]{2, 5, 8});
         combinationList.add(new int[]{2, 4, 6});
         combinationList.add(new int[]{0, 4, 8});
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //横竖屏切换前调用，保存用户想要保存的数据
+        outState.putInt("boxPositions_size", boxPositions.length);
+        for (int i = 0; i < boxPositions.length; i++) {
+            outState.putInt("boxPositions_" + i, boxPositions[i]);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // 屏幕切换完毕后调用用户存储的数据
+        if (savedInstanceState != null) {
+            ImageView imageView[] = {binding.image1, binding.image2, binding.image3,
+                    binding.image4, binding.image5, binding.image6,
+                    binding.image7, binding.image8, binding.image9
+            };
+            int size = savedInstanceState.getInt("boxPositions_size", 0);
+            for (int i = 0; i < size; i++) {
+                boxPositions[i] = savedInstanceState.getInt("boxPositions_" + i, 0);
+                if (boxPositions[i] == 1) {
+                    imageView[i].setImageResource(R.drawable.x);
+                } else if (boxPositions[i] == 2) {
+                    imageView[i].setImageResource(R.drawable.o);
+                }
+            }
+        }
     }
 
     public static MainActivity getActivity() {
@@ -104,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
     public String getPlayerTwoName() {
         return playerTwo;
     }
+
     public void setPlayerOneName(String name) {
         playerOne = name;
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
