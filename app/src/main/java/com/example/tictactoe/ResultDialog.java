@@ -1,40 +1,39 @@
 package com.example.tictactoe;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.view.View;
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
+import android.os.Bundle;
 import android.widget.TextView;
 
 public class ResultDialog extends Dialog {
 
-    private final String message;
-    private final MainActivity mainActivity;
+    private final MainActivity parentActivity;
+    private final String msg;
 
-    public ResultDialog(@NonNull Context context, String message, MainActivity mainActivity) {
+
+    public ResultDialog(@NonNull Context context, String msg, MainActivity parentActivity) {
         super(context);
-        this.message = message;
-        this.mainActivity = mainActivity;
+        this.msg = msg;
+        this.parentActivity = parentActivity;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result_dialog);
+        setContentView(R.layout.activity_result);
+
 
         TextView messageText = findViewById(R.id.messageText);
-        Button startAgainButton = findViewById(R.id.startAgainButton);
+        messageText.setText(msg);
 
-        messageText.setText(message);
-
+        Button startAgainButton = findViewById(R.id.startButton);
         startAgainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.restartMatch();
+                parentActivity.restartGame();
                 dismiss();
             }
         });

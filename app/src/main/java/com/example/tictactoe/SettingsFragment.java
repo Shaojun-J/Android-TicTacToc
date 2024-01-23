@@ -15,35 +15,37 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preference, rootKey);
         EditTextPreference one = (EditTextPreference) findPreference("player_one");
         EditTextPreference two = (EditTextPreference) findPreference("player_two");
-        one.setSummary(MainActivity.getActivity().getPlayerOneName());
-        one.setText(MainActivity.getActivity().getPlayerOneName());
-        two.setSummary(MainActivity.getActivity().getPlayerTwoName());
-        two.setText(MainActivity.getActivity().getPlayerTwoName());
-        one.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull @NotNull Preference preference, Object newValue) {
-                String s = (String)newValue;
-                MainActivity.getActivity().setPlayerOneName(s);
-                Log.d(">>>player one", s);
-                EditTextPreference pref = (EditTextPreference)preference;
-                pref.setSummary(s);
-                return false;
-            }
-        });
-
-        two.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(@NonNull @NotNull Preference preference, Object newValue) {
-                String s = (String)newValue;
-                MainActivity.getActivity().setPlayerTwoName(s);
-                Log.d(">>>player one", s);
-                EditTextPreference pref = (EditTextPreference)preference;
-                pref.setSummary(s);
-                return false;
-            }
-        });
+        if (one != null) {
+            one.setSummary(MainActivity.getActivity().getPlayerOneName());
+            one.setText(MainActivity.getActivity().getPlayerOneName());
+            one.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(@NonNull @NotNull Preference preference, Object newValue) {
+                    String s = (String) newValue;
+                    MainActivity.getActivity().setPlayerOneName(s);
+                    Log.d(">>>player one", s);
+                    EditTextPreference pref = (EditTextPreference) preference;
+                    pref.setSummary(s);
+                    return false;
+                }
+            });
+        }
+        if (two != null) {
+            two.setSummary(MainActivity.getActivity().getPlayerTwoName());
+            two.setText(MainActivity.getActivity().getPlayerTwoName());
+            two.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(@NonNull @NotNull Preference preference, Object newValue) {
+                    String s = (String) newValue;
+                    MainActivity.getActivity().setPlayerTwoName(s);
+                    Log.d(">>>player one", s);
+                    EditTextPreference pref = (EditTextPreference) preference;
+                    pref.setSummary(s);
+                    return false;
+                }
+            });
+        }
     }
-
 
 
 }

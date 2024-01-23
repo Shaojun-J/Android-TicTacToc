@@ -1,5 +1,6 @@
 package com.example.tictactoe;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,17 +25,16 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-    private final List<int[]> combinationList = new ArrayList<>();
-    private int[] boxPositions = {0, 0, 0, 0, 0, 0, 0, 0, 0}; //9 zero
-    private int playerTurn = 1;
-    private int totalSelectedBoxes = 1;
+
+    private int[] boxState = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int activePlayer = 1;
+    private int stepCounter = 1;
+    private final List<int[]> winnerList = new ArrayList<>();
     private String playerOne = "X";
     private String playerTwo = "O";
 
     private static MainActivity context = null;
-
-    EditTextPreference oneEditTextPreference;
-    EditTextPreference twoEditTextPreference;
+    ImageView[] imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,24 +45,30 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
 
-        combinationList.add(new int[]{0, 1, 2});
-        combinationList.add(new int[]{3, 4, 5});
-        combinationList.add(new int[]{6, 7, 8});
-        combinationList.add(new int[]{0, 3, 6});
-        combinationList.add(new int[]{1, 4, 7});
-        combinationList.add(new int[]{2, 5, 8});
-        combinationList.add(new int[]{2, 4, 6});
-        combinationList.add(new int[]{0, 4, 8});
+        winnerList.add(new int[]{0, 1, 2});
+        winnerList.add(new int[]{3, 4, 5});
+        winnerList.add(new int[]{6, 7, 8});
+        winnerList.add(new int[]{0, 3, 6});
+        winnerList.add(new int[]{1, 4, 7});
+        winnerList.add(new int[]{2, 5, 8});
+        winnerList.add(new int[]{2, 4, 6});
+        winnerList.add(new int[]{0, 4, 8});
+
+        imageView = new ImageView[]{binding.image1, binding.image2, binding.image3,
+                binding.image4, binding.image5, binding.image6,
+                binding.image7, binding.image8, binding.image9
+        };
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //横竖屏切换前调用，保存用户想要保存的数据
-        outState.putInt("boxPositions_size", boxPositions.length);
-        for (int i = 0; i < boxPositions.length; i++) {
-            outState.putInt("boxPositions_" + i, boxPositions[i]);
+        outState.putInt("boxPositions_size", boxState.length);
+        for (int i = 0; i < boxState.length; i++) {
+            outState.putInt("boxPositions_" + i, boxState[i]);
         }
+        outState.putInt("stepCount",stepCounter);
     }
 
     @Override
@@ -70,19 +76,16 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         // 屏幕切换完毕后调用用户存储的数据
         if (savedInstanceState != null) {
-            ImageView imageView[] = {binding.image1, binding.image2, binding.image3,
-                    binding.image4, binding.image5, binding.image6,
-                    binding.image7, binding.image8, binding.image9
-            };
             int size = savedInstanceState.getInt("boxPositions_size", 0);
             for (int i = 0; i < size; i++) {
-                boxPositions[i] = savedInstanceState.getInt("boxPositions_" + i, 0);
-                if (boxPositions[i] == 1) {
+                boxState[i] = savedInstanceState.getInt("boxPositions_" + i, 0);
+                if (boxState[i] == 1) {
                     imageView[i].setImageResource(R.drawable.x);
-                } else if (boxPositions[i] == 2) {
+                } else if (boxState[i] == 2) {
                     imageView[i].setImageResource(R.drawable.o);
                 }
             }
+            stepCounter = savedInstanceState.getInt("stepCount",0);
         }
     }
 
@@ -95,12 +98,19 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         playerOne = pref.getString("playerOne", "X");
         playerTwo = pref.getString("playerTwo", "O");
-        changePlayerTurn(playerTurn);
+        changeActivePlayer(activePlayer);
 
-//        int size = pref.getInt("boxPositions_size",0);
-//        for(int i=0; i<size; i++){
-//            boxPositions[i] =  pref.getInt("boxPositions_" + i, 0);
-//        }
+        //restore status of game
+        int size = pref.getInt("boxPositions_size", 0);
+        for (int i = 0; i < size; i++) {
+            boxState[i] = pref.getInt("boxPositions_" + i, 0);
+            if (boxState[i] == 1) {
+                imageView[i].setImageResource(R.drawable.x);
+            } else if (boxState[i] == 2) {
+                imageView[i].setImageResource(R.drawable.o);
+            }
+        }
+        stepCounter = pref.getInt("stepCount",0);
 
         super.onResume();
     }
@@ -111,13 +121,14 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("playerOne", playerOne);
         editor.putString("playerTwo", playerTwo);
 
-//        editor.putInt("boxPositions_size",boxPositions.length);
-//        for(int i=0; i<boxPositions.length; i++){
-//            editor.putInt("boxPositions_" + i, boxPositions[i]);
-//        }
+        //save status of game
+        editor.putInt("boxPositions_size", boxState.length);
+        for (int i = 0; i < boxState.length; i++) {
+            editor.putInt("boxPositions_" + i, boxState[i]);
+        }
+        editor.putInt("stepCount",stepCounter);
 
         editor.apply();
-
         super.onPause();
     }
 
@@ -151,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -165,108 +177,76 @@ public class MainActivity extends AppCompatActivity {
     public void playerTap(View view) {
         ImageView img = (ImageView) view;
         int position = Integer.parseInt(img.getTag().toString());
-        performAction((ImageView) view, position);
+        execute((ImageView) view, position);
     }
 
     public void restartGame(View view) {
-        restartMatch();
-        changePlayerTurn(1);
+        restartGame();
+        changeActivePlayer(1);
     }
 
     private void enableTap(boolean flag) {
-        binding.image1.setEnabled(flag);
-        binding.image2.setEnabled(flag);
-        binding.image3.setEnabled(flag);
-        binding.image4.setEnabled(flag);
-        binding.image5.setEnabled(flag);
-        binding.image6.setEnabled(flag);
-        binding.image7.setEnabled(flag);
-        binding.image8.setEnabled(flag);
-        binding.image9.setEnabled(flag);
-    }
-
-    private void performAction(ImageView imageView, int selectedBoxPosition) {
-        boxPositions[selectedBoxPosition] = playerTurn;
-
-        if (playerTurn == 1) {
-            imageView.setImageResource(R.drawable.x);
-            if (checkResults()) {
-                ResultDialog resultDialog = new ResultDialog(MainActivity.this, playerOne
-                        + " is a Winner!", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
-//                binding.showArea.setText("Player X wins");
-                enableTap(false);
-            } else if (totalSelectedBoxes == 9) {
-                ResultDialog resultDialog = new ResultDialog(MainActivity.this, "Match Draw", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
-            } else {
-                changePlayerTurn(2);
-                totalSelectedBoxes++;
-            }
-        } else {
-            imageView.setImageResource(R.drawable.o);
-            if (checkResults()) {
-                ResultDialog resultDialog = new ResultDialog(MainActivity.this, playerTwo
-                        + " is a Winner!", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
-                enableTap(false);
-            } else if (totalSelectedBoxes == 9) {
-                ResultDialog resultDialog = new ResultDialog(MainActivity.this, "Match Draw", MainActivity.this);
-                resultDialog.setCancelable(false);
-                resultDialog.show();
-            } else {
-                changePlayerTurn(1);
-                totalSelectedBoxes++;
-
-            }
+        for (ImageView view : imageView) {
+            view.setEnabled(flag);
         }
     }
 
-    private void changePlayerTurn(int currentPlayerTurn) {
-        playerTurn = currentPlayerTurn;
-        if (playerTurn == 1) {
+    private boolean checkWiner() {
+        for (int[] position : winnerList) {
+            if (boxState[position[0]] == activePlayer
+                    && boxState[position[1]] == activePlayer
+                    && boxState[position[2]] == activePlayer) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void execute(ImageView imageView, int index) {
+        boxState[index] = activePlayer;
+
+        if (activePlayer == 1) {
+            imageView.setImageResource(R.drawable.x);
+        } else {
+            imageView.setImageResource(R.drawable.o);
+        }
+
+        if (checkWiner()) {
+            String player = activePlayer == 1 ? playerOne : playerTwo;
+            ResultDialog resultDialog = new ResultDialog(MainActivity.this,
+                    player + " is a Winner!", MainActivity.this);
+            resultDialog.setCancelable(false);
+            resultDialog.show();
+            enableTap(false);
+        } else if (stepCounter == 9) {
+            ResultDialog resultDialog = new ResultDialog(MainActivity.this,
+                    "Match Draw", MainActivity.this);
+            resultDialog.setCancelable(false);
+            resultDialog.show();
+        } else {
+            changeActivePlayer(activePlayer == 1 ? 2 : 1);
+            stepCounter++;
+        }
+    }
+
+
+    public void restartGame() {
+        for (int i = 0; i < boxState.length; i++) {
+            boxState[i] = 0;
+            imageView[i].setImageResource(R.drawable.white_box);
+        }
+        activePlayer = 1;
+        stepCounter = 1;
+        enableTap(true);
+    }
+
+    private void changeActivePlayer(int currentPlayerTurn) {
+        activePlayer = currentPlayerTurn;
+        if (activePlayer == 1) {
             binding.showArea.setText("Player " + playerOne + "'s Turn");
         } else {
             binding.showArea.setText("Player " + playerTwo + "'s Turn");
         }
     }
 
-    private boolean checkResults() {
-        boolean response = false;
-        for (int i = 0; i < combinationList.size(); i++) {
-            final int[] combination = combinationList.get(i);
-            if (boxPositions[combination[0]] == playerTurn && boxPositions[combination[1]] == playerTurn &&
-                    boxPositions[combination[2]] == playerTurn) {
-                response = true;
-            }
-        }
-        return response;
-    }
-
-    private boolean isBoxSelectable(int boxPosition) {
-        boolean response = false;
-        if (boxPositions[boxPosition] == 0) {
-            response = true;
-        }
-        return response;
-    }
-
-    public void restartMatch() {
-        boxPositions = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0}; //9 zero
-        playerTurn = 1;
-        totalSelectedBoxes = 1;
-        binding.image1.setImageResource(R.drawable.white_box);
-        binding.image2.setImageResource(R.drawable.white_box);
-        binding.image3.setImageResource(R.drawable.white_box);
-        binding.image4.setImageResource(R.drawable.white_box);
-        binding.image5.setImageResource(R.drawable.white_box);
-        binding.image6.setImageResource(R.drawable.white_box);
-        binding.image7.setImageResource(R.drawable.white_box);
-        binding.image8.setImageResource(R.drawable.white_box);
-        binding.image9.setImageResource(R.drawable.white_box);
-        enableTap(true);
-    }
 }

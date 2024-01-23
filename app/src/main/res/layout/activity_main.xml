@@ -214,7 +214,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorGrey"
-                android:text="New Game"
+                android:text="@string/new_game"
                 android:textColor="@color/black"
                 android:padding="15dp"
                 android:layout_margin="15dp"
